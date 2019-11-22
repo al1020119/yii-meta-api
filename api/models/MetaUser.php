@@ -145,6 +145,10 @@ class MetaUser extends ActiveRecord implements IdentityInterface
         return $this->auth_key;
     }
 
+    public static function validateUser($authKey) {
+        $user = self::findOne(['auth_key' => $authKey]);
+        return $user;
+    }
 
     /**
      * @inheritdoc

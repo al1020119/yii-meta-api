@@ -11,17 +11,20 @@ class UserController extends ApiController
     public $modelClass= 'api\models\MetaUser';
 
     /***********************************************************************************************/
-    // 用户权限
+    // 用户权限: 登录操作
     /***********************************************************************************************/
-    /**
-     * 登录操作
-     * @return string
-     */
+
+    /*
+     * : http://api.meta.com/user/login.html
+     *  + username
+     *  + password_hash
+     *  + rememberMe
+     * */
     public function actionLogin()
     {
         $model = new MetaUser();
         if(Yii::$app->request->isPost){
-            $post = json_decode(file_get_contents('php://input'), true);
+            $post = $this->getPostRequestData();
             /**
              * TODO：axio默认是发送json，php默认接受form-data
              * 1. 修改axio为发送form-data
@@ -37,119 +40,144 @@ class UserController extends ApiController
         return MetaUser::LOGIN_REQUEST;
     }
 
-    /** TODO:退出登录操作 */
-    public function actionLogout() {}
 
     /***********************************************************************************************/
     // 管理员权限
     /***********************************************************************************************/
-    public function actionAddUser(){
-        if(Yii::$app->request->isPost){
-            $post = Yii::$app->request->post();
-            $model = new AdminUser();
-            $model->username = $post['username'];
-            $model->password_hash = $post['password_hash'];
-            $model->user_level = $post['user_level'];
-            $model->email = $post['email'];
-            $model->remarks = $post['remarks'];
-            if ($model->validate()) {
-                $model->setPassword($post['password_hash']);
-                $model->generateAuthKey();
-                if($model->save()){
-                    // 用户创建成功
+
+    /**
+     * 拉取用户数据列表
+     */
+    public function actionGetUserList()
+    {
+        $user = $this->validateUserAction();
+        if ($user) {
+            $request = \Yii::$app->request->get();
+            $user_query = MetaUser::find();
+            // 搜索关键字查询
+            if( isset($request['search_field'])){
+                $search_field = $request['search_field'];
+                $user_query->orFilterWhere(['like', 'username', $search_field])
+                    ->orFilterWhere(['like', 'email', $search_field])
+                    ->orFilterWhere(['like', 'remarks', $search_field]);
+            }
+            // 分页查询： 必须传否则全量影响性能
+            if (isset($request['page']) && isset($request['size'])) {
+                $total = $user_query->count();
+                $page = (int)$request['page'];
+                $size = (int)$request['size'];
+                $offset = ($page - 1) * $size;
+                // 分页查询操作
+                $user = $user_query->orderBy([ 'updated_at' => SORT_ASC, 'created_at' => SORT_ASC ])
+                    ->offset($offset)
+                    ->limit($size)
+                    ->all();
+                return ['user' => $user, 'total' => (int)$total];
+            }
+            return null;
+        }
+        return '账号异常，请重新登录';
+    }
+
+    /**
+     * 插入用户数据
+     */
+    public function actionInsertUser() {
+        $user = $this->validateUserAction();
+        if ($user) {
+            $post = $this->getPostRequestData();
+            $user = new MetaUser();
+            $user->username = $post['username'];
+            $user->user_level = $post['user_level'];
+            $user->email = $post['email'];
+            $user->status = $post['status'];
+            $user->remarks = $post['remarks'];
+            $user->setPassword($post['password_hash']);
+            $user->generateAuthKey();
+            if ($user->save()) {
+                return '插入成功';
+            }
+            return '插入失败';
+        }
+        return '账号异常，请重新登录';
+    }
+
+    /**
+     * 查询用户数据
+     */
+    public function actionQueryUser()
+    {
+        $user = $this->validateUserAction();
+        if ($user) {
+            $request = \Yii::$app->request->get();
+            if (isset($request['id'])) {
+                $user = MetaUser::findOne(['id' => $request['id']]);
+                return $user;
+            } else {
+                return null;
+            }
+        }
+        return '账号异常，请重新登录';
+    }
+
+    /**
+     * 更新用户数据
+     */
+    public function actionUpdateUser() {
+        $user = $this->validateUserAction();
+        if ($user) {
+            $post = $this->getPostRequestData();
+            $user = MetaUser::findOne(['id' => $post['id']]);
+            $user->username = $post['username'];
+            $user->user_level = $post['user_level'];
+            $user->email = $post['email'];
+            $user->status = $post['status'];
+            $user->remarks = $post['remarks'];
+            if ($user->save()) {
+                return '更新成功';
+            }
+            return '更新失败';
+        }
+        return '账号异常，请重新登录';
+    }
+
+    /**
+     * 更新用户状态
+     */
+    public function actionForbiddenUser() {
+        $user = $this->validateUserAction();
+        if ($user) {
+            $post = $this->getPostRequestData();
+            $user = MetaUser::findOne(['id' => $post['id']]);
+            $user->status = $post['status'];
+            if ($user->save()) {
+                return '更新成功';
+            }
+            return '更新失败';
+        }
+        return '账号异常，请重新登录';
+    }
+
+    /**
+     * 删除用户数据
+     */
+    public function actionDeletaeUser()
+    {
+        $user = $this->validateUserAction();
+        if ($user) {
+            $post = $this->getPostRequestData();
+            if (isset($post['id'])) {
+                $query = MetaUser::findOne(['id' => $post['id']]);
+                if($query->delete()) {
+                    return "删除成功";
                 } else {
-                    // 用户创建失败
+                    return "删除失败";
                 }
             } else {
-                // 用户创建失败
+                return "删除失败";
             }
-        } else {
-            // 请使用正确的请求方式
         }
-    }
-
-
-    public function actionChangeInfo(){
-        $id = Yii::$app->request->get('id');
-        $model = new MetaUser();
-        if($item = $model->find()->where(['id' => $id])->one()){
-            if(Yii::$app->request->isPost){
-                $post = Yii::$app->request->post();
-                $item->email = $post['email'];
-                $item->user_level = $post['user_level'];
-                $item->remarks = $post['remarks'];
-                if ($item->validate()) {
-                    if($item->save()){
-                        // 信息修改成功
-                    } else {
-                        // 信息修改失败
-                    }
-                } else {
-                    // 信息修改失败
-                }
-            } else {
-                // 请使用正确的请求方式
-            }
-        } else{
-            // 用户不存在
-        }
-    }
-
-
-    public function actionDeleteUser(){
-        $id = Yii::$app->request->get('id');
-        $model = new MetaUser();
-        if($item = $model->find()->where(['id' => $id])->one()){
-            if($item->delete()){
-                // 用户删除成功
-            } else {
-                // 用户删除失败
-            }
-        }else{
-            // 用户不存在
-        }
-    }
-
-
-    public function actionChangePwd(){
-        $id = Yii::$app->request->get('id');
-        $model = new MetaUser();
-        if($item = $model->find()->where(['id' => $id])->one()){
-            if(Yii::$app->request->isPost){
-                $post = Yii::$app->request->post();
-                $item->password_hash = $post['password_hash'];
-                if ($item->validate()) {
-                    $item->setPassword($post['password_hash']);
-                    if($item->save()){
-                        // 密码修改成功
-                    } else {
-                        // 密码修改失败
-                    }
-                } else {
-                    // 密码修改失败
-                }
-            } else {
-                // 请使用正确的请求方式
-            }
-        }else{
-            // 用户不存在
-        }
-    }
-
-
-    public function actionChangeStatus(){
-        $id = Yii::$app->request->get('id');
-        $model = new MetaUser();
-        if($item = $model->find()->where(['id' => $id])->one()){
-            $item->status = $item->status == 1 ? 0 : 1;
-            if($item->save()){
-                // 切换成功
-            } else {
-                // 切换失败
-            }
-        }else{
-            // 用户不存在了
-        }
+        return '账号异常，请重新登录';
     }
 
 }

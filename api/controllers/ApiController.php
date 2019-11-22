@@ -4,10 +4,11 @@ namespace api\controllers;
 // 指定允许其他域名访问
 header('Access-Control-Allow-Origin:*');
 // 响应类型
-header('Access-Control-Allow-Methods:*');
+header('Access-Control-Allow-Methods:GET,POST');
 // 响应头设置
 header('Access-Control-Allow-Headers:x-requested-with,content-type');
 
+use api\models\MetaUser;
 use yii\rest\ActiveController;
 use yii\web\Response;
 use yii\filters\auth\QueryParamAuth;
@@ -17,6 +18,19 @@ use yii\filters\Cors;
 
 class ApiController extends ActiveController
 {
+
+    /**
+     * {@inheritdoc}
+     */
+    public function actions()
+    {
+        return [
+            'error' => [
+                'class' => 'yii\web\ErrorAction',
+            ],
+        ];
+    }
+
     public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -33,8 +47,8 @@ class ApiController extends ActiveController
             ],
             // 写在optional里的方法不需要token验证
             'optional' => [
-                'login', // 默认不需要token验证
-                'test', // 默认不需要token验证
+                //'login'
+                "*"
             ],
         ];
         // 这个是跨域配置: https://www.shiqidu.com/d/846
@@ -61,15 +75,15 @@ class ApiController extends ActiveController
         return $behaviors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function actions()
-    {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-        ];
+    protected function getPostRequestData() {
+        $post = json_decode(file_get_contents('php://input'), true);
+        return $post;
+    }
+
+    protected function validateUserAction() {
+        $headers = getallheaders();
+        $auth_key = $headers['Authorization'];
+        $user = MetaUser::validateUser($auth_key);
+        return $user;
     }
 }
