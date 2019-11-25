@@ -11,19 +11,15 @@ use yii\web\IdentityInterface;
  * User model
  *
  * @property integer $id
- * @property string $username
+ * @property string  $username
  * @property integer $user_level
- * @property string $password_hash
- * @property string $password_reset_token
- * @property string $email
- * @property string $auth_key
- * @property string $source_type
- * @property integer $status
- * @property integer $created_at
+ * @property string  $password_hash
+ * @property string  $auth_key
+ * @property string  $email
+ * @property string  $status
+ * @property string  $created_at
  * @property integer $updated_at
- * @property integer remarks
- * @property integer last_access
- * @property string $password write-only password
+ * @property integer $remarks
  */
 class MetaUser extends ActiveRecord implements IdentityInterface
 {

@@ -21,19 +21,22 @@ class DatabaseController extends ApiController
             // 搜索关键字查询
             if( isset($request['search_field'])){
                 $search_field = $request['search_field'];
-                $database_query->orFilterWhere(['like', 'db_name', $search_field])
-                    ->orFilterWhere(['like', 'dimension_table', $search_field])
-                    ->orFilterWhere(['like', 'table_name', $search_field])
-                    ->orFilterWhere(['like', 'field_name', $search_field])
+                $database_query->orFilterWhere(['like', 'table_desc', $search_field])
                     ->orFilterWhere(['like', 'field_type', $search_field])
-                    ->orFilterWhere(['like', 'source_type', $search_field])
-                    ->orFilterWhere(['like', 'field_value', $search_field])
-                    ->orFilterWhere(['like', 'table_desc', $search_field])
                     ->orFilterWhere(['like', 'field_desc', $search_field])
-                    ->orFilterWhere(['like', 'field_value_desc', $search_field])
-                    ->orFilterWhere(['like', 'created_by', $search_field])
-                    ->orFilterWhere(['like', 'updated_by', $search_field])
-                    ->orFilterWhere(['like', 'comment', $search_field]);
+                    ->orFilterWhere(['like', 'dimension_table', $search_field]);
+            }
+            if (isset($request['source_type']) && strlen($request['source_type'])) {
+                $database_query->andWhere([ 'source_type' => $request['source_type'] ]);
+            }
+            if (isset($request['db_name']) && strlen($request['db_name'])) {
+                $database_query->andWhere([ 'db_name' => $request['db_name'] ]);
+            }
+            if (isset($request['table_name']) && strlen($request['table_name'])) {
+                $database_query->andWhere([ 'table_name' => $request['table_name'] ]);
+            }
+            if (isset($request['field_name']) && strlen($request['field_name'])) {
+                $database_query->andWhere([ 'field_name' => $request['field_name'] ]);
             }
             // 分页查询： 必须传否则全量影响性能
             if (isset($request['page']) && isset($request['size'])) {
@@ -42,7 +45,7 @@ class DatabaseController extends ApiController
                 $size = (int)$request['size'];
                 $offset = ($page - 1) * $size;
                 // 分页查询操作
-                $database = $database_query->orderBy([ 'updated_at' => SORT_ASC, 'created_at' => SORT_ASC ])
+                $database = $database_query->orderBy([ 'updated_at' => SORT_ASC ])
                     ->offset($offset)
                     ->limit($size)
                     ->all();
@@ -53,106 +56,45 @@ class DatabaseController extends ApiController
         return '账号异常，请重新登录';
     }
 
-    /**
-     * 插入元数据
-     */
-    public function actionInsertDatabase() {
-        $user = $this->validateUserAction();
-        if ($user) {
-            $post = $this->getPostRequestData();
-            $database = new MetaDatabase();
-            $database->db_name = $post['db_name'];
-            $database->table_name = $post['table_name'];
-            $database->table_desc = $post['table_desc'];
-            $database->field_name = $post['field_name'];
-            $database->field_desc = $post['field_desc'];
-            $database->field_type = $post['field_type'];
-            $database->field_value = $post['field_value'];
-            $database->field_value_desc = $post['field_value_desc'];
-            $database->is_dimension = $post['is_dimension'];
-            $database->dimension_table = $post['dimension_table'];
-            $database->source_type = $post['source_type'];
-            $database->status = $post['status'];
-            $database->comment = $post['comment'];
-            $database->created_by = $user->username;
-            $database->updated_by = $user->username;
-            if ($database->save()) {
-                return '插入成功';
-            }
-            return '插入失败';
-        }
-        return '账号异常，请重新登录';
+    public function actionGetDataSummary() {
+        $sql = 'SELECT COUNT(DISTINCT db_name) as db_count, COUNT(DISTINCT table_name) as table_count, COUNT(field_name) as field_count FROM meta.meta_database';
+        $data = MetaDatabase::findBySql($sql)->asArray()->all();
+        return $data;
     }
 
-    /**
-     * 查询元数据
-     */
-    public function actionQueryDatabase()
-    {
-        $user = $this->validateUserAction();
-        if ($user) {
-            $request = \Yii::$app->request->get();
-            if (isset($request['id'])) {
-                $database = MetaDatabase::findOne(['id' => $request['id']]);
-                return $database;
-            } else {
-                return null;
-            }
-        }
-        return '账号异常，请重新登录';
+    public function actionGetSourceType() {
+        $data = MetaDatabase::find()->select(['source_type'])->groupBy(['source_type'])->asArray()->all();
+        return array_column($data,'source_type');
     }
 
-    /**
-     * 更新元数据
-     */
-    public function actionUpdateDatabase() {
-        $user = $this->validateUserAction();
-        if ($user) {
-            $post = $this->getPostRequestData();
-            $database = MetaDatabase::findOne(['id' => $post['id']]);
-            $database->db_name = $post['db_name'];
-            $database->table_name = $post['table_name'];
-            $database->table_desc = $post['table_desc'];
-            $database->field_name = $post['field_name'];
-            $database->field_desc = $post['field_desc'];
-            $database->field_type = $post['field_type'];
-            $database->field_value = $post['field_value'];
-            $database->field_value_desc = $post['field_value_desc'];
-            $database->is_dimension = $post['is_dimension'];
-            $database->dimension_table = $post['dimension_table'];
-            $database->source_type = $post['source_type'];
-            $database->status = $post['status'];
-            $database->comment = $post['comment'];
-            $database->created_by = $post['created_by'];
-            $database->updated_by = $user->username;
-            if ($database->save()) {
-                return '更新成功';
-            }
-            return '更新失败';
+    public function actionGetDbName() {
+        $request = \Yii::$app->request->get();
+        if (isset($request['source_type'])) {
+            $sql = 'SELECT db_name FROM meta.meta_database where source_type=:source_type GROUP BY db_name ORDER BY db_name ASC';
+            $data = MetaDatabase::findBySql($sql, [':source_type'=>$request['source_type']])->asArray()->all();
+            return array_column($data,'db_name');
         }
-        return '账号异常，请重新登录';
+        return null;
     }
 
-    /**
-     * 删除元数据
-     */
-    public function actionDeletaeDatabase()
-    {
-        $user = $this->validateUserAction();
-        if ($user) {
-            $post = $this->getPostRequestData();
-            if (isset($post['id'])) {
-                $query = MetaDatabase::findOne(['id' => $post['id']]);
-                if($query->delete()) {
-                    return "删除成功";
-                } else {
-                    return "删除失败";
-                }
-            } else {
-                return "删除失败";
-            }
+    public function actionGetTableName() {
+        $request = \Yii::$app->request->get();
+        if (isset($request['db_name'])) {
+            $sql = 'SELECT table_name FROM meta.meta_database where db_name=:db_name GROUP BY table_name ORDER BY table_name ASC';
+            $data = MetaDatabase::findBySql($sql, [':db_name'=>$request['db_name']])->asArray()->all();
+            return array_column($data,'table_name');;
         }
-        return '账号异常，请重新登录';
+        return null;
+    }
+
+    public function actionGetFieldName() {
+        $request = \Yii::$app->request->get();
+        if (isset($request['table_name'])) {
+            $sql = 'SELECT field_name FROM meta.meta_database where table_name=:table_name GROUP BY field_name ORDER BY field_name ASC';
+            $data = MetaDatabase::findBySql($sql, [':table_name'=>$request['table_name']])->asArray()->all();
+            return array_column($data,'field_name');;
+        }
+        return null;
     }
 
 }

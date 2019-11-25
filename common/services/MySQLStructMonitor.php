@@ -2,6 +2,7 @@
 
 namespace common\services;
 
+use api\models\MetaDatabase;
 use yii\db\mssql\PDO;
 
 /**
@@ -11,6 +12,7 @@ use yii\db\mssql\PDO;
  */
 
 class MySQLStructMonitor {
+
     private $dbName;
     private $db;
 
@@ -83,140 +85,136 @@ class MySQLStructMonitor {
     }
 
     /**
-     * 在实例化后直接指定此方法就能直接输出
-     *
-     * @param array $templates     表模板和字段模板
-     *
-     * @return string $string      返回字符串
+     *  获取表备注信息
      */
-    public function run ($template_column = null)
+    private function getTableComment($table) {
+        $tableComments = explode("\r\n", $table['table_comment']);
+        $tableComment = $tableComments[0] ?: $table['table_name'];
+        return $tableComment;
+    }
+
+    /**
+     * 获取结构信息
+     */
+    private function getStructsData($table_name, $table_desc, $column) {
+        $field_name = $column['Field'] ?: 'None';
+        $field_type = $column['Type'] ?: ' ';
+        $is_null = $column['Null'] ?: 'NO';
+        $key = $column['Key'] ?: ' ';
+        $default = $column['Default'] ?: 'None';
+        $extra = $column['Extra'] ?: ' ';
+        $privileges = $column['Privileges'] ?: ' ';
+        $comment = $column['Comment'] ?: ' ';
+        $structs = array('oracle',$this->dbName, $table_name, $table_desc, $field_name, $field_type,$comment,'NO','无', $is_null, $key, $default, $extra, $privileges, '', '', '');
+        return $structs;
+    }
+
+    /**
+     * 执行插入操作
+     */
+    private function batchInsertAction($data) {
+        $keys=['source_type','db_name', 'table_name', 'table_desc', 'field_name', 'field_type','field_desc','is_dimension','dimension_table', 'is_null', 'key', 'default', 'extra', 'privileges','updated_at','updated_by', 'comment'];
+        //执行批量添加
+        $res= \Yii::$app->db->createCommand()->batchInsert(MetaDatabase::tableName(), $keys, $data)->execute();
+        if (empty($res)) {
+            echo '------------------------------------插入失败------------------------------------';
+        }
+        echo '------------------------------------插入成功------------------------------------';
+    }
+
+    /**
+     * 初始化元数据结构信息：仅第一次或重新全量时才执行
+     */
+    public function run ()
+    {
+        $tables = $this->getTables();
+        $data = array();
+        foreach ($tables as $table) {
+            //表名
+            $table_name = $table['table_name'];
+            $query = MetaDatabase::find();
+            $query->andWhere([ 'table_name' => $table_name ]);
+            if ($query->count() > 0) {
+                var_dump('------------------------------------表结构信息已经存在------------------------------------');
+                continue;
+            }
+            //表描述
+            $table_desc = $this->getTableComment($table);
+            // 字段信息
+            $columns = $this->getColumns($table['table_name']);
+            foreach ($columns as $column) {
+                $structs = $this->getStructsData($table_name, $table_desc, $column);
+                $data[] = $structs;
+            }
+        }
+        if (count($data) > 0) {
+            $this->batchInsertAction($data);
+        } else {
+            var_dump('------------------------------------没有可操作的表结构信息------------------------------------');
+        }
+    }
+
+    /**
+     * 自动同步脚本
+     */
+    public function async ()
     {
         $tables = $this->getTables();
 
-        $structsArray = [];
         foreach ($tables as $table) {
-            $table_structs = [];
-            //获取表名
-            $tableName = $table['table_name'];
-            $table_structs['tableName'] = $tableName;
-
-            //获取表评论
-            $tableComments = explode("\r\n", $table['table_comment']);
-            $tableComment = $tableComments[0] ?: $tableName;
-            $table_structs['tableComment'] = $tableComment;
-
+            $data = array();
+            //表名
+            $table_name = $table['table_name'];
+            //表描述
+            $table_desc = $this->getTableComment($table);
+            // 字段信息
             $columns = $this->getColumns($table['table_name']);
-            $columnArray = [];
-            if (!empty($template_column)) {
+
+            $query = MetaDatabase::find();
+            $query->andWhere([ 'table_name' => $table_name ]);
+            var_dump($query->count());
+            /** 表信息没有，前往整表数据插入处理 */
+            if ($query->count() == 0) {
                 foreach ($columns as $column) {
-                    $columnString = $this->replaceTemplate($column, $template_column);
-                    array_push($columnArray,$columnString);
+                    $structs = $this->getStructsData($table_name, $table_desc, $column);
+                    $data[] = $structs;
                 }
-            } else {
-                $columnArray = $columns;
+                var_dump('------------------------------------没有任何表结构记录，全量插入表:'.$table_name.'------------------------------------');
+                $this->batchInsertAction($data);
+                continue;
             }
-            $table_structs['columns'] = $columnArray;
-            $structsArray[] = $table_structs;
-        }
-
-        return $structsArray;
-    }
-
-    /**
-     * 根据字段模板替换
-     *
-     * @param array $column        字段数组
-     * @param string $template     字段模板
-     *
-     * @return string $string      返回替换后字符串
-     *
-     * 'Field' => string 'id' (length=2)
-     * 'Type' => string 'int(11)' (length=7)
-     * 'Collation' => null
-     * 'Null' => string 'NO' (length=2)
-     * 'Key' => string 'PRI' (length=3)
-     * 'Default' => null
-     * 'Extra' => string 'auto_increment' (length=14)
-     * 'Privileges' => string 'select,insert,update,references' (length=31)
-     * 'Comment' => string '用户唯一标识' (length=18)
-     */
-    private function replaceTemplate ($column, $template)
-    {
-        $search = [
-            '{field}',
-            '{type}',
-            '{collation}',
-            '{null}',
-            '{key}',
-            '{default}',
-            '{extra}',
-            '{privileges}',
-            '{comment}',
-            '{nullName}',
-            '{keyName}',
-        ];
-
-        $replace = [
-            $column['Field'] ?: ' ',
-            $column['Type'] ?: ' ',
-            $column['Collation'] ?: ' ',
-            $column['Null'] ?: ' ',
-            $column['Key'] ?: ' ',
-            $column['Default'] ?: ' ',
-            $column['Extra'] ?: ' ',
-            $column['Privileges'] ?: ' ',
-            $column['Comment'] ?: ' ',
-            $this->getNullName($column['Null']) ?: ' ',
-            $this->getKeyName($column['Key']) ?: ' ',
-        ];
-
-        $string = str_replace($search, $replace, $template);
-        $string = preg_replace('/\s+/', ' ', $string);
-        return $string;
-    }
-
-    /**
-     * 字段参数转换
-     *
-     * @param string $key          key 参数，PRI, UNI, MUL
-     *
-     * @return string $keyName     返回对应的参数名称
-     */
-    private function getKeyName($key)
-    {
-        switch ($key) {
-            case 'PRI':
-                $keyName = 'Primary Key';
-                break;
-
-            case 'UNI':
-                $keyName = 'Unique Key';
-                break;
-
-            case 'MUL':
-                $keyName = 'Key';
-                break;
-
-            default:
-                $keyName = $key;
-        }
-
-        return $keyName;
-    }
-
-    /**
-     * 字段参数转换
-     *
-     * @param string $null         null 参数，YES or NO
-     *
-     * @return string              返回空字符串或 NOT NULL
-     */
-    private function getNullName ($null)
-    {
-        if ($null == 'YES') {
-            return '';
-        } else {
-            return 'NOT NULL';
+            foreach ($columns as $column) {
+                $data = array();
+                $field_name = $column['Field'] ?: ' ';
+                $query = MetaDatabase::find();
+                $query->andWhere([ 'table_name' => $table_name ]);
+                $query->andWhere([ 'field_name' => $field_name ]);
+                /** 字段信息没有，前往字段数据插入处理 */
+                if ($query->count() == 0) {
+                    $structs = $this->getStructsData($table_name, $table_desc, $column);
+                    $data[] = $structs;
+                    var_dump('------------------------------------没有字段信息记录，直接插入字段:'.$field_name.'------------------------------------');
+                    $this->batchInsertAction($data);
+                    continue;
+                }
+                $field_type = $column['Type'] ?: ' ';
+                $default = $column['Default'] ?: ' ';
+                $comment = $column['Comment'] ?: ' ';
+                $echeme_info = $query->one();
+                if ($echeme_info->field_type != $field_type || $echeme_info->default != $default || $echeme_info->comment != $comment) {
+                    $structs = $this->getStructsData($table_name, $table_desc, $column);
+                    $data[] = $structs;
+                    var_dump('------------------------------------有字段信息记录，更新字段记录:'.$field_name.'------------------------------------');
+                    $echeme_info->field_type = $field_type;
+                    $echeme_info->default = $default;
+                    $echeme_info->comment = $comment;
+                    $echeme_info->save();
+                }
+            }
+            if (count($data) == 0) {
+                var_dump('------------------------------------没有可操作的表结构信息------------------------------------');
+            }
         }
     }
+
 }
