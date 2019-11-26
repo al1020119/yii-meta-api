@@ -52,6 +52,12 @@ class DimensionController extends ApiController
         return '账号异常，请重新登录';
     }
 
+
+    public function actionGetDimensionTable() {
+        $data = MetaDimension::find()->select(['table_name'])->groupBy(['table_name'])->asArray()->all();
+        return array_column($data,'table_name');
+    }
+
     /**
      * 插入元数据
      */

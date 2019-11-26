@@ -16,6 +16,7 @@ class MySQLStructMonitor {
     private $dbName;
     private $db;
 
+    private $source_type;
     /**
      * 构造函数
      *
@@ -26,9 +27,11 @@ class MySQLStructMonitor {
      * @param string $user         数据库用户名
      * @param string $password     数据库密码
      */
-    public function __construct ($host, $dbName, $user, $password = '')
+    public function __construct ($host, $dbName, $user, $password = '',$source_type='MySQL')
     {
         $dsn = sprintf("mysql:host=%s;dbname=%s", $host, $dbName);
+
+        $this->source_type = $source_type;
 
         try {
             $this->db = new PDO($dsn, $user, $password);
@@ -98,14 +101,14 @@ class MySQLStructMonitor {
      */
     private function getStructsData($table_name, $table_desc, $column) {
         $field_name = $column['Field'] ?: 'None';
-        $field_type = $column['Type'] ?: ' ';
+        $field_type = $column['Type'] ?: 'None';
         $is_null = $column['Null'] ?: 'NO';
-        $key = $column['Key'] ?: ' ';
+        $key = $column['Key'] ?: 'None';
         $default = $column['Default'] ?: 'None';
-        $extra = $column['Extra'] ?: ' ';
-        $privileges = $column['Privileges'] ?: ' ';
-        $comment = $column['Comment'] ?: ' ';
-        $structs = array('oracle',$this->dbName, $table_name, $table_desc, $field_name, $field_type,$comment,'NO','无', $is_null, $key, $default, $extra, $privileges, '', '', '');
+        $extra = $column['Extra'] ?: 'None';
+        $privileges = $column['Privileges'] ?: 'None';
+        $field_desc = $column['Comment'] ?: 'None';
+        $structs = array($this->source_type,$this->dbName, $table_name, $table_desc, $field_name, $field_type, $field_desc, 0, '无', $is_null, $key, $default, $extra, $privileges, 'Sync', 'None');
         return $structs;
     }
 
@@ -113,7 +116,7 @@ class MySQLStructMonitor {
      * 执行插入操作
      */
     private function batchInsertAction($data) {
-        $keys=['source_type','db_name', 'table_name', 'table_desc', 'field_name', 'field_type','field_desc','is_dimension','dimension_table', 'is_null', 'key', 'default', 'extra', 'privileges','updated_at','updated_by', 'comment'];
+        $keys=['source_type','db_name', 'table_name', 'table_desc', 'field_name', 'field_type','field_desc','is_dimension','dimension_table', 'is_null', 'key', 'default', 'extra', 'privileges', 'updated_by', 'comment'];
         //执行批量添加
         $res= \Yii::$app->db->createCommand()->batchInsert(MetaDatabase::tableName(), $keys, $data)->execute();
         if (empty($res)) {

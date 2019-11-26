@@ -45,10 +45,14 @@ class DatabaseController extends ApiController
                 $size = (int)$request['size'];
                 $offset = ($page - 1) * $size;
                 // 分页查询操作
-                $database = $database_query->orderBy([ 'updated_at' => SORT_ASC ])
-                    ->offset($offset)
+                $data = $database_query->offset($offset)
                     ->limit($size)
                     ->all();
+                $database = array();
+                foreach ($data as $item) {
+                    $item->is_dimension = ($item->is_dimension == 1);
+                    array_push($database, $item);
+                }
                 return ['database' => $database, 'total' => (int)$total];
             }
             return null;
@@ -58,8 +62,8 @@ class DatabaseController extends ApiController
 
     public function actionGetDataSummary() {
         $sql = 'SELECT COUNT(DISTINCT db_name) as db_count, COUNT(DISTINCT table_name) as table_count, COUNT(field_name) as field_count FROM meta.meta_database';
-        $data = MetaDatabase::findBySql($sql)->asArray()->all();
-        return $data;
+        $data = MetaDatabase::findBySql($sql)->asArray()->one();
+        return array($data['db_count'],$data['table_count'],$data['field_count']);
     }
 
     public function actionGetSourceType() {
@@ -95,6 +99,23 @@ class DatabaseController extends ApiController
             return array_column($data,'field_name');;
         }
         return null;
+    }
+
+    public function actionSetDimensionStatus() {
+        $user = $this->validateUserAction();
+        $post = $this->getPostRequestData();
+        if ($user && isset($post['id'])) {
+            $database = MetaDatabase::findOne(['id' => $post['id']]);
+            // 设置维度
+            if ($database) {
+                $database->is_dimension = $post['is_dimension'];
+                $database->dimension_table = $post['dimension_table'];
+                $database->save();
+            } else {
+                return '变更维度状态失败';
+            }
+        }
+        return '账号异常，请重新登录';
     }
 
 }

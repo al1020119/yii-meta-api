@@ -1,6 +1,7 @@
 <?php
 namespace api\models;
 
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
 /**
@@ -34,5 +35,21 @@ class MetaDatabase extends ActiveRecord
     {
         return '{{%database}}';
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'created_at',// 自己根据数据库字段修改
+                'updatedAtAttribute' => 'updated_at', // 自己根据数据库字段修改, // 自己根据数据库字段修改
+                'value' => function(){return date('Y-m-d H:i:s',time()+8*60*60);},
+            ],
+        ];
+    }
+
 
 }
