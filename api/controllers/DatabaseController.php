@@ -109,7 +109,7 @@ class DatabaseController extends ApiController
             // 设置维度
             if ($database) {
                 $database->is_dimension = $post['is_dimension'];
-                $database->dimension_table = $post['dimension_table'];
+                $database->dimension_table = $post['is_dimension'] == '1' ? $post['dimension_table'] : '无';
                 $database->save();
             } else {
                 return '变更维度状态失败';

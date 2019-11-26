@@ -2,15 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="efebe702-9ce4-4032-8af5-23ce66497757" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/controllers/DatabaseController.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/controllers/DatabaseController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/controllers/DimensionController.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/controllers/DimensionController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/models/MetaDatabase.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/models/MetaDatabase.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/models/MetaDimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/models/MetaDimension.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/config/main.php" beforeDir="false" afterPath="$PROJECT_DIR$/common/config/main.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/services/MySQLStructMonitor.php" beforeDir="false" afterPath="$PROJECT_DIR$/common/services/MySQLStructMonitor.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/console/config/params.php" beforeDir="false" afterPath="$PROJECT_DIR$/console/config/params.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/console/controllers/MonitorController.php" beforeDir="false" afterPath="$PROJECT_DIR$/console/controllers/MonitorController.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -27,8 +19,8 @@
       <file leaf-file-name="MetaDatabase.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/api/models/MetaDatabase.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="294">
-              <caret line="36" column="5" lean-forward="true" selection-start-line="36" selection-start-column="5" selection-end-line="51" selection-end-column="5" />
+            <state relative-caret-position="525">
+              <caret line="36" column="5" selection-start-line="36" selection-start-column="5" selection-end-line="51" selection-end-column="5" />
               <folding>
                 <element signature="e#29#65#0#PHP" expanded="true" />
               </folding>
@@ -48,20 +40,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ApiController.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ApiController.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/api/controllers/ApiController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
+            <state relative-caret-position="-426">
               <caret line="22" column="20" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DatabaseController.php" pinned="false" current-in-tab="false">
+      <file leaf-file-name="DatabaseController.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/api/controllers/DatabaseController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="26" column="54" selection-start-line="26" selection-start-column="54" selection-end-line="26" selection-end-column="54" />
+            <state relative-caret-position="444">
+              <caret line="111" column="105" selection-start-line="111" selection-start-column="105" selection-end-line="111" selection-end-column="105" />
             </state>
           </provider>
         </entry>
@@ -69,7 +61,7 @@
       <file leaf-file-name="MonitorController.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/console/controllers/MonitorController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
+            <state relative-caret-position="435">
               <caret line="30" column="31" selection-start-line="30" selection-start-column="31" selection-end-line="30" selection-end-column="31" />
               <folding>
                 <element signature="e#39#78#0#PHP" expanded="true" />
@@ -99,7 +91,7 @@
       <file leaf-file-name="MetaDimension.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/api/models/MetaDimension.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="534">
+            <state relative-caret-position="720">
               <caret line="48" column="5" selection-start-line="48" selection-start-column="5" selection-end-line="48" selection-end-column="5" />
             </state>
           </provider>
@@ -108,7 +100,7 @@
       <file leaf-file-name="MetaUser.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/api/models/MetaUser.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="855">
+            <state relative-caret-position="795">
               <caret line="57" selection-start-line="57" selection-end-line="71" selection-end-column="5" />
               <folding>
                 <element signature="e#29#37#0#PHP" expanded="true" />
@@ -120,7 +112,7 @@
       <file leaf-file-name="MySQLStructMonitor.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/common/services/MySQLStructMonitor.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1650">
+            <state relative-caret-position="1635">
               <caret line="110" column="43" selection-start-line="110" selection-start-column="43" selection-end-line="110" selection-end-column="43" />
               <folding>
                 <element signature="e#35#63#0#PHP" expanded="true" />
@@ -171,7 +163,6 @@
         <option value="$PROJECT_DIR$/api/models/MetaUser.php" />
         <option value="$PROJECT_DIR$/api/models/MetaDatabase.php" />
         <option value="$PROJECT_DIR$/api/controllers/DimensionController.php" />
-        <option value="$PROJECT_DIR$/api/controllers/DatabaseController.php" />
         <option value="$PROJECT_DIR$/common/config/services.php" />
         <option value="$PROJECT_DIR$/common/config/main.php" />
         <option value="$PROJECT_DIR$/common/config/params.php" />
@@ -179,6 +170,7 @@
         <option value="$PROJECT_DIR$/console/controllers/MonitorController.php" />
         <option value="$PROJECT_DIR$/common/services/MySQLStructMonitor.php" />
         <option value="$PROJECT_DIR$/api/models/MetaDimension.php" />
+        <option value="$PROJECT_DIR$/api/controllers/DatabaseController.php" />
       </list>
     </option>
   </component>
@@ -270,7 +262,6 @@
     </include_path>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="24" />
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="834" />
@@ -283,6 +274,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -339,7 +331,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -403,14 +394,15 @@
       <workItem from="1574732648786" duration="850000" />
       <workItem from="1574737075714" duration="458000" />
       <workItem from="1574738260030" duration="5919000" />
+      <workItem from="1574767199371" duration="156000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="51909000" />
+    <option name="totallyTimeSpent" value="52065000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="24" y="23" width="1440" height="834" extended-state="0" />
+    <frame x="0" y="23" width="1440" height="834" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -425,7 +417,6 @@
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15808298" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32913166" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -435,6 +426,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32913166" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -683,13 +675,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/common/config/services.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="8" selection-start-line="1" selection-start-column="8" selection-end-line="1" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/common/config/services.php" />
     <entry file="file://$PROJECT_DIR$/common/config/main.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -713,7 +699,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/console/controllers/MonitorController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
+        <state relative-caret-position="435">
           <caret line="30" column="31" selection-start-line="30" selection-start-column="31" selection-end-line="30" selection-end-column="31" />
           <folding>
             <element signature="e#39#78#0#PHP" expanded="true" />
@@ -723,7 +709,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/common/services/MySQLStructMonitor.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1650">
+        <state relative-caret-position="1635">
           <caret line="110" column="43" selection-start-line="110" selection-start-column="43" selection-end-line="110" selection-end-column="43" />
           <folding>
             <element signature="e#35#63#0#PHP" expanded="true" />
@@ -733,8 +719,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/api/models/MetaDatabase.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="294">
-          <caret line="36" column="5" lean-forward="true" selection-start-line="36" selection-start-column="5" selection-end-line="51" selection-end-column="5" />
+        <state relative-caret-position="525">
+          <caret line="36" column="5" selection-start-line="36" selection-start-column="5" selection-end-line="51" selection-end-column="5" />
           <folding>
             <element signature="e#29#65#0#PHP" expanded="true" />
           </folding>
@@ -743,14 +729,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/api/models/MetaDimension.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="534">
+        <state relative-caret-position="720">
           <caret line="48" column="5" selection-start-line="48" selection-start-column="5" selection-end-line="48" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/api/models/MetaUser.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="855">
+        <state relative-caret-position="795">
           <caret line="57" selection-start-line="57" selection-end-line="71" selection-end-column="5" />
           <folding>
             <element signature="e#29#37#0#PHP" expanded="true" />
@@ -762,13 +748,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1020">
           <caret line="68" column="56" selection-start-line="68" selection-start-column="56" selection-end-line="68" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/api/controllers/DatabaseController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="54" selection-start-line="26" selection-start-column="54" selection-end-line="26" selection-end-column="54" />
         </state>
       </provider>
     </entry>
@@ -784,8 +763,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/api/controllers/ApiController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
+        <state relative-caret-position="-426">
           <caret line="22" column="20" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/controllers/DatabaseController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="444">
+          <caret line="111" column="105" selection-start-line="111" selection-start-column="105" selection-end-line="111" selection-end-column="105" />
         </state>
       </provider>
     </entry>
