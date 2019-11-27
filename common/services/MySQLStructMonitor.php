@@ -108,7 +108,7 @@ class MySQLStructMonitor {
         $extra = $column['Extra'] ?: 'None';
         $privileges = $column['Privileges'] ?: 'None';
         $field_desc = $column['Comment'] ?: 'None';
-        $structs = array($this->source_type,$this->dbName, $table_name, $table_desc, $field_name, $field_type, $field_desc, 0, '无', $is_null, $key, $default, $extra, $privileges, 'Sync', 'None');
+        $structs = array($this->source_type,$this->dbName, $table_name, $table_desc, $field_name, $field_type, $field_desc, 0, '无', $is_null, $key, $default, $extra, $privileges, 'Sync', 'None', $this->getNowDate(),$this->getNowDate());
         return $structs;
     }
 
@@ -116,7 +116,7 @@ class MySQLStructMonitor {
      * 执行插入操作
      */
     private function batchInsertAction($data) {
-        $keys=['source_type','db_name', 'table_name', 'table_desc', 'field_name', 'field_type','field_desc','is_dimension','dimension_table', 'is_null', 'key', 'default', 'extra', 'privileges', 'updated_by', 'comment'];
+        $keys=['source_type','db_name', 'table_name', 'table_desc', 'field_name', 'field_type','field_desc','is_dimension','dimension_table', 'is_null', 'key', 'default', 'extra', 'privileges', 'updated_by', 'comment', 'created_at', 'updated_at'];
         //执行批量添加
         $res= \Yii::$app->db->createCommand()->batchInsert(MetaDatabase::tableName(), $keys, $data)->execute();
         if (empty($res)) {
@@ -218,6 +218,10 @@ class MySQLStructMonitor {
                 var_dump('------------------------------------没有可操作的表结构信息------------------------------------');
             }
         }
+    }
+
+    private function getNowDate() {
+        return date('Y-m-d H:i:s',time()+8*60*60);
     }
 
 }
