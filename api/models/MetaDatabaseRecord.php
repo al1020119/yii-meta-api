@@ -8,24 +8,14 @@ use yii\db\ActiveRecord;
  * Meta model
  *
  * @property integer $id
- * @property string  $source_type
- * @property integer $db_name
- * @property string  $table_name
- * @property string  $table_desc
- * @property string  $field_name
- * @property string  $field_type
- * @property string  $is_dimension
- * @property integer $dimension_table
- * @property integer $is_null
- * @property integer $key
- * @property integer $default
- * @property integer $extra
- * @property string  $privileges
- * @property integer $updated_at
- * @property integer $updated_by
- * @property integer $comment
+ * @property string  $row_id
+ * @property integer $type
+ * @property string  $content
+ * @property string  $created_at
+ * @property string  $updated_at
+ * @property string  $created_by
  */
-class MetaDatabase extends ActiveRecord
+class MetaDatabaseRecord extends ActiveRecord
 {
 
     /**
@@ -33,7 +23,7 @@ class MetaDatabase extends ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%database}}';
+        return '{{%database_record}}';
     }
 
     /**

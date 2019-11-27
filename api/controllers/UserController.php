@@ -68,10 +68,16 @@ class UserController extends ApiController
                 $size = (int)$request['size'];
                 $offset = ($page - 1) * $size;
                 // 分页查询操作
-                $user = $user_query->orderBy([ 'updated_at' => SORT_ASC, 'created_at' => SORT_ASC ])
+                $data = $user_query->orderBy([ 'updated_at' => SORT_ASC, 'created_at' => SORT_ASC ])
                     ->offset($offset)
                     ->limit($size)
                     ->all();
+
+                $user = array();
+                foreach ($data as $item) {
+                    $item->status = ($item->status == 1);
+                    array_push($user, $item);
+                }
                 return ['user' => $user, 'total' => (int)$total];
             }
             return null;

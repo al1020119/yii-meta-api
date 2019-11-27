@@ -3,6 +3,7 @@
 namespace api\controllers;
 
 use api\models\MetaDatabase;
+use api\models\MetaDatabaseRecord;
 
 class DatabaseController extends ApiController
 {
@@ -111,11 +112,32 @@ class DatabaseController extends ApiController
                 $database->is_dimension = $post['is_dimension'];
                 $database->dimension_table = $post['is_dimension'] == '1' ? $post['dimension_table'] : '无';
                 $database->save();
+                $this->updateDatabaseRecord($user->username,$post['id'],$post['is_dimension'],$post['dimension_table']);
             } else {
                 return '变更维度状态失败';
             }
         }
         return '账号异常，请重新登录';
+    }
+
+
+    public function updateDatabaseRecord($username, $id, $is_dimension, $dimension_table) {
+        $history_record = MetaDatabaseRecord::findOne(['row_id' => $id]);
+        $record = new MetaDatabaseRecord();
+        $record->row_id = $id;
+        $record->content = $dimension_table;
+        $record->created_by = $username;
+        if (!$history_record) {
+            // 插入操作日志
+            $record->type = 1;
+        } else {
+            if ($is_dimension == '1') {
+                $record->type = 1;
+            } else {
+                $record->type = 0;
+            }
+        }
+        $record->save();
     }
 
 }

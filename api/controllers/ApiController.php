@@ -86,4 +86,5 @@ class ApiController extends ActiveController
         $user = MetaUser::validateUser($auth_key);
         return $user;
     }
+
 }
