@@ -10,6 +10,12 @@ class UserController extends ApiController
 
     public $modelClass= 'api\models\MetaUser';
 
+
+    public function actionIndexxxxx() {
+        return '';
+        return json_decode(array(Yii::getVersion()));
+    }
+
     /***********************************************************************************************/
     // 用户权限: 登录操作
     /***********************************************************************************************/
