@@ -1,6 +1,7 @@
 <?php
 namespace api\models;
 
+use api\services\HttpHelper;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -169,6 +170,7 @@ class MetaUser extends ActiveRecord implements IdentityInterface
      * Generates password hash from password and sets it to the model
      *
      * @param string $password
+     * @throws \yii\base\Exception
      */
     public function setPassword($password)
     {
@@ -190,7 +192,7 @@ class MetaUser extends ActiveRecord implements IdentityInterface
     public function login()
     {
         if (!$admin = static::findByUsername($this->username)) {
-            return self::LOGIN_USERNAME;
+            return HttpHelper::responseDate(self::LOGIN_USERNAME);
         }
         if (0 == $admin->status) {
             return self::LOGIN_STATUS;

@@ -57,12 +57,21 @@ return [
             'class' => 'yii\web\Response',
             'on beforeSend' => function ($event) {
                 $response = $event->sender;
-                $response->data = [
-                    'success' => $response->isSuccessful,
-                    'code' => $response->getStatusCode(),
-                    'message' => $response->statusText,
-                    'data' => $response->data,
-                ];
+                if ($response->data !== null) {
+                    $response->data = [
+                        //'success' => $response->isSuccessful,
+                        'code' => $response->getStatusCode(),
+                        'message' => $response->statusText,
+                        'data' => $response->data,
+                    ];
+                } else {
+                    $response->data = [
+                        'code' => 201,
+                        'data' => null,
+                        'message' => $response->statusText,
+                    ];
+                }
+                // 手动将抛出异常的状态码改为 200, 确保不被 jQuery 捕获
                 $response->statusCode = 200;
             },
         ],
